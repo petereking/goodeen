@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodeen.mapper.TripCommentMapper">
+	<resultMap id="CommentMap" type="Comment">
+		<id property="id" column="comment.id" />
+		<result property="content" column="comment.content" />
+		<result property="commentLevel" column="comment.commentLevel" />
+		<result property="creator" column="creator" />
+		<result property="createTime" column="comment.createTime" />
+		<association property="user" javaType="User">
+			<id property="id" column="comment.user.id" />
+			<result property="name" column="comment.user.name" />
+			<result property="screenName" column="comment.user.screenName"/>
+			<result property="headerImage" column="comment.user.headerImage"/>
+		</association>
+		<association property="landLord" javaType="Trip">
+			<id property="id" column="comment.landLord" />
+		</association>
+		<association property="storeyLord" javaType="Comment">
+			<id property="id" column="comment.storeyLord" />
+		</association>
+		<collection property="subComments" ofType="Comment">
+			<id property="id" column="subComment.id" />
+			<result property="content" column="subComment.content" />
+			<result property="commentLevel" column="subComment.commentLevel" />
+			<result property="creator" column="subComment.creator" />
+			<result property="createTime" column="subComment.createTime" />
+			<association property="user" javaType="User">
+				<id property="id" column="subComment.user.id" />
+				<result property="name" column="subComment.user.name" />
+				<result property="screenName" column="subComment.user.screenName"/>
+				<result property="headerImage" column="subComment.user.headerImage"/>
+			</association>
+			<association property="upUser" javaType="User">
+				<id property="id" column="subComment.upUser.id" />
+				<result property="name" column="subComment.upUser.name" />
+				<result property="screenName" column="subComment.upUser.screenName"/>
+				<result property="headerImage" column="subComment.upUser.headerImage"/>			
+			</association>
+			<association property="landLord" javaType="Trip">
+				<id property="id" column="subComment.landLord" />
+			</association>
+			<association property="storeyLord" javaType="Comment">
+				<id property="id" column="subComment.storeyLord" />
+			</association>						
+		</collection>
+	</resultMap>
+	<select id="query" resultMap="com.goodeen.mapper.TripCommentMapper.CommentMap">
+		select sr.id            'comment.id',
+		       sr.content       'comment.content',
+		       sr.createTime    'comment.createTime',
+		       sr.commentLevel  'comment.commentLevel',
+		       sr.landLord      'comment.landLord',
+		       sr.storeyLord    'comment.storeyLord',
+		       su.id            'comment.user.id',
+		       su.name          'comment.user.name',
+		       su.screenname    'comment.user.screenName',
+		       su.headerImage   'comment.user.headerImage',
+		       rr.id           	'subComment.id',
+		       rr.content       'subComment.content',
+		       rr.createTime    'subComment.createTime',
+		       rr.commentLevel  'subComment.commentLevel',
+		       rr.landLord      'subComment.landLord',
+		       rr.storeyLord    'subComment.storeyLord',
+		       ru.id            'subComment.user.id',
+		       ru.name          'subComment.user.name',
+		       ru.screenname    'subComment.user.screenName',
+		       ru.headerImage   'subComment.user.headerImage',
+		       rupu.id          'subComment.upUser',
+		       rupu.name        'subComment.upUser.name',
+		       rupu.screenname  'subComment.upUser.screenName',
+		       rupu.headerImage 'subComment.upUser.headerImage'
+		  from trip t
+		  left join tripComment sr
+		    on sr.commentLevel = 1
+		   and t.id = sr.landLord
+		  left join tripComment rr
+		    on rr.commentLevel = 2
+		   and sr.id = rr.storeyLord
+		  join user su
+		    on sr.creator = su.id
+		  left join user ru
+		    on rr.creator = ru.id
+		  left join user rupu
+		    on rr.upUser = rupu.id
+		 where t.id = #{landLord.id}
+	</select>	
+	
+	<insert id="create" useGeneratedKeys="true" keyProperty="id">
+		insert into TripComment
+		  (id, content, createTime, creator, upUser, commentLevel, landLord, storeyLord)
+		values
+		  (#{id},
+		   #{content},
+		   sysdate(),
+		   #{creator},
+		   #{upUser.id},
+		   #{commentLevel},
+		   #{landLord.id},
+		   #{storeyLord.id})
+	</insert>
+</mapper>

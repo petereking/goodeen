@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="emojionearea.css" media="screen">
+<script type="text/javascript" src="/jquery/jquery.js"></script>
+<script type="text/javascript" src="emojionearea.js"></script>
+<title></title>
+<script type='text/javascript'>
+	//<![CDATA[
+	$(function() {
+		$("#say-content").emojioneArea({
+			pickerPosition : "bottom",
+			shortnames : false,
+	    inline: false
+		});
+		$("#say-content").show();
+	});
+	//]]>
+</script>
+</head>
+<body>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<div>
+		<textarea id="say-content" placeholder=":smile:">:smile:</textarea>
+	</div>
+</body>
+</html>
+

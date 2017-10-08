@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodeen.solr.mapper.IndexMapper">
+	<select id="queryForUsers" resultType="com.goodeen.solr.model.UserCore">
+		select u.* from user u 
+		<if test="minutes != 0">
+    	where u.updateTime > now() - interval #{minutes} minute
+    </if> 
+	</select>		
+	
+	<select id="queryForTrips" resultType="com.goodeen.solr.model.TripCore">
+		select 
+		    t.id,
+		    t.tags,
+		    t.summary
+		from
+		    trip t
+		<if test="minutes != 0">
+    	where t.updateTime > now() - interval #{minutes} minute
+    </if> 
+	</select>		
+</mapper>

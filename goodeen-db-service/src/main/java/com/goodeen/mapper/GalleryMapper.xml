@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.goodeen.mapper.GalleryMapper">
+	<select id="getById" resultType="Gallery">
+		select
+			g.id,
+			g.name,
+			g.coverId 'cover.id',
+			g.coverUrl 'cover.url',
+			g.imageCount,
+			g.summary,
+			g.creator,
+			g.createTime,
+			g.updator,
+			g.updateTime
+		from
+			gallery g
+		where
+			g.id = #{id}
+	</select>
+	
+	<select id="queryByUserId" resultType="Gallery">
+		select
+			g.id,
+			g.name,
+			g.coverId 'cover.id',
+			g.coverUrl 'cover.url',
+			g.imageCount,
+			g.summary,
+			g.creator,
+			g.createTime,
+			g.updator,
+			g.updateTime
+		from
+			gallery g
+		where
+			g.creator = #{userId}
+	</select>
+	
+	<select id="queryImagesById" resultType="Image">
+		select
+			i.id,
+			i.url,
+			i.galleryId 'gallery.id',
+			i.summary,
+			i.creator,
+			i.createTime,
+			i.updator,
+			i.updateTime
+		from
+			image i
+		where
+			i.galleryId = #{id}
+	</select>
+	
+	<select id="pageImagesByGallery" resultType="Image">
+		select
+			i.id,
+			i.url,
+			i.galleryId 'gallery.id',
+			i.summary,
+			i.creator,
+			i.createTime,
+			i.updator,
+			i.updateTime
+		from
+			image i
+		where
+			i.galleryId = #{t.id}
+	</select>
+	
+	<insert id="create" useGeneratedKeys="true" keyProperty="id">
+		insert into gallery (
+			id,
+			name,
+			coverId,
+			coverUrl,
+			imageCount,
+			summary,
+			creator,
+			createTime
+		)
+		values
+			(
+				#{id},
+				#{name},
+				#{cover.id},
+				#{cover.url},
+				#{imageCount},
+				#{summary},
+				#{creator},
+				sysdate()
+			)
+	</insert>
+	
+	<insert id="createImage" useGeneratedKeys="true" keyProperty="id">
+		insert into image (
+			id,
+			url,
+			galleryId,
+			summary,
+			creator,
+			createTime
+		)
+		values
+			(
+				#{id},
+				#{url},
+				#{gallery.id},
+				#{summary},
+				#{creator},
+				sysdate()
+			)	
+	</insert>
+	
+	<update id="updateImageCount">
+		update gallery g
+		set g.imageCount = #{imageCount},
+		 g.updator = #{updator},
+		 g.updateTime = sysdate()
+		where
+			g.id = #{id}
+	</update>
+	
+	<update id="updateCover">
+		update gallery g
+		set g.coverId = #{cover.id},
+		 g.coverUrl = #{cover.url},
+		 g.updator = #{updator},
+		 g.updateTime = sysdate()
+		where
+			g.id = #{id}
+	</update>
+</mapper> 

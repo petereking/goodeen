@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- mybatis的日志打印方式比较多，
+		SLF4J | LOG4J | LOG4J2 | JDK_LOGGING | 
+		COMMONS_LOGGING | STDOUT_LOGGING | NO_LOGGING，
+		可以根据自己的需要进行配置	-->
+	<settings>
+ 		<setting name="logImpl" value="STDOUT_LOGGING" />
+	</settings>
+	<typeAliases>
+		<package name="com.goodeen.solr.model" />
+		<package name="com.goodeen.enums" />
+	</typeAliases>
+	<typeHandlers>
+		<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+			javaType="com.goodeen.enums.OverlayColor" />
+		<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+			javaType="com.goodeen.enums.Position" />
+		<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+			javaType="com.goodeen.enums.State" />
+		<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+			javaType="com.goodeen.enums.Relation" />
+		<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+			javaType="com.goodeen.enums.CommentLevel" />
+		<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+			javaType="com.goodeen.enums.Transport" />
+		<typeHandler handler="org.apache.ibatis.type.EnumOrdinalTypeHandler"
+			javaType="com.goodeen.enums.TripMode" />
+	</typeHandlers>
+</configuration>

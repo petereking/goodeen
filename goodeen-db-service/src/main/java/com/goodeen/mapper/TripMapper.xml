@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodeen.mapper.TripMapper">
+	<select id="getById" resultType="Trip">
+		select t.*,
+		       u.id 'user.id',
+		       u.name 'user.name',
+		       u.screenName 'user.screenName',
+		       u.headerImage 'user.headerImage'
+		  from trip t, user u
+		 where t.creator = u.id
+		 	 and t.id = #{id}
+	</select>
+
+	<select id="queryByIds" resultType="Trip">
+		select t.*,
+		       u.id 'user.id',
+		       u.name 'user.name',
+		       u.screenName 'user.screenName',
+		       u.headerImage 'user.headerImage'
+		  from trip t, user u
+		 where t.creator = u.id
+		 	 and t.id in
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+		  	#{id}
+		</foreach>
+		order by t.id desc
+	</select>
+
+	<insert id="create" useGeneratedKeys="true" keyProperty="id" parameterType="Trip">
+		insert into trip
+		  (id,
+			 title,
+			 cover,
+			 summary,
+			 tags,
+			 departure,
+			 destination,
+			 departureTime,
+			 arrivalTime,
+			 transport,
+			 tripMode,
+			 creator,
+			 createTime,
+		   updateTime)
+		values
+		  (#{id},
+		   #{title},
+		   #{cover},
+		   #{summary},
+		   #{tags},
+		   #{departure.id},
+		   #{destination.id},
+		   #{departureTime},
+		   #{arrivalTime},
+		   #{transport},
+		   #{tripMode},
+		   #{creator},
+		   #{createTime},
+		   #{updateTime})
+	</insert>
+	
+	<select id="getCommentStat" resultType="int">
+		select count(1) from tripcomment where landLord = #{trip.id}
+	</select>
+
+	<select id="isPlused" resultType="boolean">
+		select count(1) from tripplused where user=#{user.id} and trip = #{trip.id}
+	</select>
+	
+	<select id="getPlusedStat" resultType="int">
+		select count(1) from tripplused where trip = #{id}
+	</select>
+
+	<select id="isFavorited" resultType="boolean">
+		select count(1) from tripfavorited where user=#{user.id} and trip = #{trip.id}
+	</select>
+	
+	<select id="getFavoritedStat" resultType="int">
+		select count(1) from tripfavorited where trip = #{id}
+	</select>
+
+	<update id="setCommentStat">
+		update trip set commentStat=#{commentStat} where id=#{id}
+	</update>					
+
+	<update id="setPlusedStat">
+		update trip set plusedStat=#{plusedStat} where id=#{id}
+	</update>					
+	
+	<update id="setFavoritedStat">
+		update trip set favoritedStat=#{favoritedStat} where id=#{id}
+	</update>			
+		
+	<insert id="plus">
+		insert into tripplused (trip, user, `dateTime`) values (#{trip.id},#{user.id},sysdate())
+	</insert>
+	
+	<delete id="unPlus">
+		delete from tripplused where user=#{user.id} and trip = #{trip.id}
+	</delete>	
+	
+	<insert id="favorite">
+		insert into tripfavorited (trip, user, `dateTime`) values (#{trip.id},#{user.id},sysdate())
+	</insert>
+	
+	<delete id="unFavorite">
+		delete from tripfavorited where user=#{user.id} and trip = #{trip.id}
+	</delete>	
+</mapper>

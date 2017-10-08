@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodeen.mapper.UserMapper">
+	<select id="queryRoleCodes" resultType="string">
+		select
+			distinct
+			r.code
+		from
+			user u,
+			role r,
+			userrole ur
+		where
+			u.id = ur.user
+		and	r.id = ur.role
+		and u.email = #{email}
+	</select>
+	
+	<select id="queryPermissionCodes" resultType="string">
+		select
+			distinct
+			p.code
+		from
+			user u,
+			userrole ur,
+			permission p,
+			rolepermission rp
+		where
+				u.id = ur.user
+		and	p.id = rp.permission
+		and ur.role = rp.role
+		and u.email = #{email}
+	</select>
+	
+	<select id="queryAllPermissions" resultType="Permission">
+		select
+			distinct
+			p.url,
+			p.code
+		from
+			permission p
+	</select>
+		
+	<select id="getByEmail" resultType="User">
+		select u.id,
+	    u.email,
+	    u.screenName,
+	    u.password,
+	    u.`key`,
+	    u.state,
+	    u.createTime,
+	    u.updateTime,
+	    u.image,
+	    u.headerImage,
+	    u.name,
+	    u.location,
+	    u.url,
+	    u.summary,
+	    u.theme "theme.id",
+	    u.backgroundImage "theme.backgroundImage",
+	    u.backgroundTiled "theme.backgroundTiled",
+	    u.backgroundPosition "theme.backgroundPosition",
+	    u.backgroundColor "theme.backgroundColor",
+	    u.linkColor "theme.linkColor",
+	    u.overlayColor "theme.overlayColor",
+	    u.tripStat,
+	    u.followingStat,
+	    u.followerStat
+		from user u where u.email=#{email}
+	</select>
+	
+	<insert id="create" useGeneratedKeys="true" keyProperty="id" parameterType="User">
+		insert into user
+		  (id,
+		   name,
+		   email,
+		   screenName,
+		   password,
+		   `key`,
+		   state,
+		   theme,
+		   backgroundImage,
+		   backgroundTiled,
+		   backgroundPosition,
+		   backgroundColor,
+		   linkColor,
+		   overlayColor,
+		   tripStat,
+		   followingStat,
+		   followerStat,
+		   createTime)
+		values
+		  (#{id},
+		   #{name},
+		   #{email},
+		   #{screenName},
+		   #{password},
+		   #{key},
+		   #{state},
+		   #{theme.id},
+		   #{theme.backgroundImage},
+		   #{theme.backgroundTiled},
+		   #{theme.backgroundPosition},
+		   #{theme.backgroundColor},
+		   #{theme.linkColor},
+		   #{theme.overlayColor},
+		   #{tripStat},
+		   #{followingStat},
+		   #{followerStat},
+		   SYSDATE())
+	</insert>
+	
+	<insert id="permissionRole">
+		insert into userrole (user, role, `datetime`) values (#{user},#{role}, SYSDATE())
+	</insert>
+	
+	<insert id="createForgetPasswordRequest">
+		insert into forgetpassword (time, email, `key`) values (#{password},#{email},#{key})
+	</insert>
+
+	<select id="getByKey" resultType="User">
+		<![CDATA[
+			select u.* from user u where u.`key`=#{key}
+		]]>
+	</select>
+
+	<select id="getByForgetPasswordKey" resultType="User">
+		<![CDATA[
+			select u.id,
+				f.email,
+				u.screenName,
+		    f.time password,
+		    f.`key`
+			from forgetpassword f,user u
+			where f.email = u.email and f.`key`=#{key}
+		]]>
+	</select>
+		
+	<update id="activate">
+		update user set state=1 where `key`=#{key}
+	</update>	
+	
+	<update id="updateAccount">
+		update user set
+			 screenName = #{screenName}
+			 <if test="email!=null">
+				 , email = #{email}, password = #{password}, `key` = #{key}
+			 </if>
+			where id=#{id}
+	</update>	
+	
+	<select id="getByScreenName" resultType="User">
+		<![CDATA[
+			select u.* from user u where u.screenName=#{screenName}
+		]]>
+	</select>
+	
+	<select id="getTagsById" resultType="Tag">
+		<![CDATA[
+			select t.id,t.name from tag t, usertag ut where t.id = ut.tag and ut.user=#{id}
+		]]>
+	</select>	
+	
+	<select id="getRelation" resultType="Relation">
+		select if(#{user.id} = #{follower.id}, 0,if(count(1)=0, 2, 1)) from userfollower uf where uf.user = #{user.id} and uf.follower=#{follower.id}
+	</select>
+	
+	<select id="getFollowerStat" resultType="int">
+		select count(1) from userfollower uf where uf.user = #{id}
+	</select>
+	
+	<select id="getFollowingStat" resultType="int">
+		select count(1) from userfollower uf where uf.follower = #{id}
+	</select>
+	
+	<insert id="follow">
+		insert into userfollower (user, follower,dateTime) values (#{user.id},#{follower.id},sysdate())
+	</insert>
+	
+	<delete id="unFollow">
+		delete from userfollower where user=#{user.id} and follower = #{follower.id}
+	</delete>	
+	
+	<update id="setFollowStat">
+		update user set followerStat=#{followerStat}, followingStat=#{followingStat} where id=#{id}
+	</update>
+	
+	<select id="pageFollowing" resultType="int">
+		select u.id
+		  from user u, userfollower uf
+		 where uf.follower = #{user.id}
+		   and u.id = uf.user
+	</select>		
+
+	<select id="pageFollowers" resultType="int">
+		select u.id
+		  from user u, userfollower uf
+		 where uf.user = #{user.id}
+		   and u.id = uf.follower
+	</select>
+
+	<select id="pageTrips" resultType="Trip">
+		select t.*,
+		       u.id 'user.id',
+		       u.name 'user.name',
+		       u.screenName 'user.screenName',
+		       u.headerImage 'user.headerImage'
+		  from trip t, user u
+		 where u.id = #{user.id}
+		   and t.creator = #{user.id}
+	</select>
+
+	<select id="pageFollowingTrips" resultType="Trip">
+		select t.*,
+		       u.id 'user.id',
+		       u.name 'user.name',
+		       u.screenName 'user.screenName',
+		       u.headerImage 'user.headerImage'
+		  from trip t, user u, userfollower uf
+		 where uf.follower = #{user.id}
+			 and u.id = uf.user
+		   and t.creator = uf.user
+	</select>
+
+	<select id="queryByIdsWithRelation" resultType="User">
+		select if(u.id = #{currentUser.id}, 0, if(isnull(uf.user), 2, 1)) relation,
+		       u.*
+		  from user u
+		  left join userfollower uf
+		    on u.id = uf.user
+		   and uf.follower = #{currentUser.id}
+		 where u.id in
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+		  	#{id}
+		</foreach>
+		order by u.id desc
+	</select>
+
+	<select id="queryLastestUsers" resultType="User">
+		select if(u.id = #{currentUser.id}, 0, if(isnull(uf.user), 2, 1)) relation,
+		       u.*
+		  from user u
+		  left join userfollower uf
+		    on u.id = uf.user
+		   and uf.follower = #{currentUser.id}
+		order by u.id desc
+		limit 0, 10
+	</select>
+	
+	<update id="updateDesign">
+		update user
+		   set theme              = #{theme.id},
+		       backgroundImage    = #{theme.backgroundImage},
+		       backgroundTiled    = #{theme.backgroundTiled},
+		       backgroundPosition = #{theme.backgroundPosition},
+		       backgroundColor    = #{theme.backgroundColor},
+		       linkColor          = #{theme.linkColor},
+		       overlayColor       = #{theme.overlayColor}
+		 where id = #{id}
+	</update>			
+	
+	<update id="updateProfile">
+		update user
+		   set image       = #{image},
+		       headerImage = #{headerImage},
+		       name        = #{name},
+		       location    = #{location},
+		       url         = #{url},
+		       summary		 = #{summary},
+		       updateTime = #{updateTime}
+		 where id = #{id}
+	</update>			
+</mapper>

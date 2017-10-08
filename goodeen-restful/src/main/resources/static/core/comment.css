@@ -1,0 +1,34 @@
+@charset "utf-8";
+
+.first-comment, .second-comment {
+	padding: 0 0 0 40px;
+	position: relative;
+}
+
+.ui-avatar {
+	left: 0;
+	position: absolute;
+	top: 0;
+}
+
+.comment-content a {
+	color: #235660;
+	margin-left: 5px;
+}
+.comments .emojione,.comments .emojioneemoji {
+    font-size: inherit;
+    height: 2ex;
+    width: 2.1ex;
+    min-height: 20px;
+    min-width: 20px;
+    display: inline-block;
+    margin: -.2ex .15em .2ex;
+    line-height: normal;
+    vertical-align: middle;
+    max-width: 100%;
+    top: 0;
+    background-image:none!important;
+}
+.comments ul,.sub-comments ul {
+	list-style: none;
+}

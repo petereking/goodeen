@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goodeen.mapper.RegionMapper">
+	<select id="queryRegionsJson" resultType="hashmap">
+		<![CDATA[
+			select 
+			    id,
+			    name,
+					fullname,
+			    concat(name, ' ', threeword, ' ', replace(spell, ', ', '')) `match`
+			from
+			    region 
+		]]>
+	</select>	
+	
+	<select id="queryThreeLevelRegions" resultType="Region">
+		<![CDATA[
+			select * from region where `level`=3 and threeword=''
+		]]>
+	</select>	
+	
+	<insert id="create" parameterType="Region">
+		insert into region
+		  (id,
+			 name,
+			 fullname,
+			 location,
+			 spell,
+			 threeword,
+			 parent,
+			 level,
+		   `order`)
+		values
+		  (#{id},
+		   #{name},
+		   #{fullname},
+		   #{location},
+		   #{spell},
+		   #{threeword},
+		   #{parent},
+		   #{level},
+		   #{order})
+	</insert>	
+	
+  <insert id="batchCreate" parameterType="List">  
+		insert into region
+		  (id,
+			 name,
+			 fullname,
+			 location,
+			 spell,
+			 threeword,
+			 parent,
+			 level,
+		   `order`)
+		values
+    <foreach collection="list" item="region" index="index" separator=",">
+		  (#{region.id},
+		   #{region.name},
+		   #{region.fullname},
+		   #{region.location},
+		   #{region.spell},
+		   #{region.threeword},
+		   #{region.parent},
+		   #{region.level},
+		   #{region.order})      
+    </foreach>  
+	</insert>	
+	
+  <update id="batchUpdate" parameterType="List">  
+    <foreach collection="list" item="region" index="index" separator=";">
+    	update region
+    	<set>
+			threeword=#{region.threeword}
+    	</set>
+			where id = #{region.id}     
+    </foreach>  
+	</update>	
+</mapper>
